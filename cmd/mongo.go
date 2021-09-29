@@ -41,7 +41,7 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Infof("badger path: %+v", badger)
-		conn, err := kv.NewKvDBConn(badger, true)
+		conn, err := kv.NewKvDBConn(badger, false)
 		if err != nil {
 			log.Error(err)
 			return
@@ -65,11 +65,11 @@ to quickly create a Cobra application.`,
 			select {
 			case <-cmd.Context().Done():
 				log.Info("context done")
-				time.Sleep(time.Second*5)
+				time.Sleep(time.Second * 5)
 				return
 			case sig := <-sigCh:
 				log.Infof("signal %s captured", sig)
-				time.Sleep(time.Second*5)
+				time.Sleep(time.Second * 5)
 				return
 			default:
 				gas := filDB.ReadGasInfo(fromHeight)
