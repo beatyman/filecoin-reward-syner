@@ -19,10 +19,10 @@ func NewMongoConn(uri string, database string) (*FilMongoSink, error) {
 	}
 	gasColl := client.Database(database).Collection("gas")
 	transColl := client.Database(database).Collection("transfer")
-	if err := gasColl.CreateOneIndex(context.Background(), options.IndexModel{Key: []string{"height,cid"}, Unique: true}); err != nil {
+	if err := gasColl.CreateOneIndex(context.Background(), options.IndexModel{Key: []string{"cid"}, Unique: true}); err != nil {
 		log.Error(err)
 	}
-	if err := transColl.CreateOneIndex(context.Background(), options.IndexModel{Key: []string{"height,cid"}, Unique: true}); err != nil {
+	if err := transColl.CreateOneIndex(context.Background(), options.IndexModel{Key: []string{"cid"}, Unique: true}); err != nil {
 		log.Error(err)
 	}
 	return &FilMongoSink{
