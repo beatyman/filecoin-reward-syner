@@ -41,7 +41,8 @@ func NewFilLedgerInstance(dstore datastore.Batching) *FilLedger {
 	}
 }
 
-func (fil *FilLedger) ReadGasInfo(height uint64) {
+func (fil *FilLedger) ReadGasInfo(height uint64) []Message{
+	result:=make([]Message,0)
 	iter, _ := fil.Gas.Query(query.Query{Prefix: fmt.Sprintf("/%d/", height), Orders: []query.Order{query.OrderByKey{}}})
 	for r := range iter.Next() {
 		if r.Error != nil {
@@ -51,11 +52,13 @@ func (fil *FilLedger) ReadGasInfo(height uint64) {
 		log.Infof("%+v", gconv.String(r.Key))
 		var gas Message
 		_ = json.Unmarshal(r.Value, &gas)
-		log.Infof("%+v", gas)
+		result=append(result,gas)
 	}
+	return  result
 }
 
-func (fil *FilLedger) ReadTransInfo(height uint64) {
+func (fil *FilLedger) ReadTransInfo(height uint64)[]TransferModel {
+	result:=make([]TransferModel,0)
 	iter, _ := fil.Trans.Query(query.Query{Prefix: fmt.Sprintf("/%d/", height), Orders: []query.Order{query.OrderByKey{}}})
 	for r := range iter.Next() {
 		if r.Error != nil {
@@ -65,6 +68,6 @@ func (fil *FilLedger) ReadTransInfo(height uint64) {
 		log.Infof("%+v", gconv.String(r.Key))
 		var tran TransferModel
 		_ = json.Unmarshal(r.Value, &tran)
-		log.Infof("%+v", tran)
 	}
+	return  result
 }

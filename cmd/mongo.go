@@ -16,7 +16,10 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"filecoin-reward-syner/kv"
+	"filecoin-reward-syner/mongo"
+	"filecoin-reward-syner/util"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
 )
@@ -32,9 +35,30 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("mongo called")
+		log.Infof("badger path: %+v", badger)
+		conn, err := kv.NewKvDBConn(badger, true)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+		filDB := kv.NewFilLedgerInstance(conn)
+		mongoConn, err := mongo.NewMongoConn(mongoUri, database)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+		gas := filDB.ReadGasInfo(fromHeight)
+		if err := mongoConn.SaveGasInfoBatch(cmd.Context(), util.ConvertGasKvToMongo(gas)); err != nil {
+			log.Error(err)
+		}
+		transfers := filDB.ReadTransInfo(fromHeight)
+		if err = mongoConn.SaveTransInfoBatch(cmd.Context(), util.ConvertTransferKvToMongo(transfers)); err != nil {
+			log.Error(err)
+		}
 	},
 }
+var mongoUri string
+var database string
 
 func init() {
 	rootCmd.AddCommand(mongoCmd)
@@ -48,4 +72,8 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// mongoCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	mongoCmd.Flags().StringVar(&badger, "badger", "/data/sdb/reward", "badger default path")
+	mongoCmd.Flags().Uint64Var(&fromHeight, "from", 0, "list from height")
+	mongoCmd.Flags().StringVar(&mongoUri, "mongoUri", "mongodb://admin:k1LxehGHCR8Ws@103.44.247.17:27017/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false", "mongo uri")
+	mongoCmd.Flags().StringVar(&database, "database", "filecoin", "database name")
 }
