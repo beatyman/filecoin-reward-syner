@@ -39,6 +39,7 @@ to quickly create a Cobra application.`,
 			return
 		}
 		filDB:=kv.NewFilLedgerInstance(conn)
+		log.Infof("sync pos: ",filDB.GetSyncPos())
 		filDB.ReadGasInfo(fromHeight)
 		filDB.ReadTransInfo(fromHeight)
 	},

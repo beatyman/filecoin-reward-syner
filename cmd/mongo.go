@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"errors"
 	"filecoin-reward-syner/kv"
 	"filecoin-reward-syner/mongo"
 	"filecoin-reward-syner/util"
@@ -47,18 +48,31 @@ to quickly create a Cobra application.`,
 			log.Error(err)
 			return
 		}
-		gas := filDB.ReadGasInfo(fromHeight)
-		if err := mongoConn.SaveGasInfoBatch(cmd.Context(), util.ConvertGasKvToMongo(gas)); err != nil {
-			log.Error(err)
+		if fromHeight == 0 {
+			fromHeight = filDB.GetSyncPos()
 		}
-		transfers := filDB.ReadTransInfo(fromHeight)
-		if err = mongoConn.SaveTransInfoBatch(cmd.Context(), util.ConvertTransferKvToMongo(transfers)); err != nil {
-			log.Error(err)
+		if endHeight <= fromHeight {
+			log.Error(errors.New("end height is less than from height"))
+			return
+		}
+		for endHeight > fromHeight {
+			gas := filDB.ReadGasInfo(fromHeight)
+			if err := mongoConn.SaveGasInfoBatch(cmd.Context(), util.ConvertGasKvToMongo(gas)); err != nil {
+				log.Error(err)
+			}
+			transfers := filDB.ReadTransInfo(fromHeight)
+			if err = mongoConn.SaveTransInfoBatch(cmd.Context(), util.ConvertTransferKvToMongo(transfers)); err != nil {
+				log.Error(err)
+			}
+			filDB.SaveSyncPos(fromHeight)
+			fromHeight++
+			log.Infof("sync progress height: %d", fromHeight)
 		}
 	},
 }
 var mongoUri string
 var database string
+var endHeight uint64
 
 func init() {
 	rootCmd.AddCommand(mongoCmd)
@@ -74,6 +88,7 @@ func init() {
 	// mongoCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	mongoCmd.Flags().StringVar(&badger, "badger", "/data/sdb/reward", "badger default path")
 	mongoCmd.Flags().Uint64Var(&fromHeight, "from", 0, "list from height")
+	mongoCmd.Flags().Uint64Var(&endHeight, "endHeight", 950000, "list from height")
 	mongoCmd.Flags().StringVar(&mongoUri, "mongoUri", "mongodb://admin:k1LxehGHCR8Ws@10.41.1.13:27017/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false", "mongo uri")
 	mongoCmd.Flags().StringVar(&database, "database", "filecoin", "database name")
 }
