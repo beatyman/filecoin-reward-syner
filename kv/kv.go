@@ -69,6 +69,7 @@ func (fil *FilLedger) ReadTransInfo(height uint64)[]TransferModel {
 		log.Infof("%+v", gconv.String(r.Key))
 		var tran TransferModel
 		_ = json.Unmarshal(r.Value, &tran)
+		result=append(result,tran)
 		log.Infof("%+v",tran)
 	}
 	return  result
