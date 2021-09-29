@@ -103,7 +103,7 @@ func init() {
 	// mongoCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	mongoCmd.Flags().StringVar(&badger, "badger", "/data/sdb/reward", "badger default path")
 	mongoCmd.Flags().Uint64Var(&fromHeight, "from", 0, "list from height")
-	mongoCmd.Flags().Uint64Var(&endHeight, "endHeight", 950000, "list from height")
+	mongoCmd.Flags().Uint64Var(&endHeight, "end", 950000, "list from height")
 	mongoCmd.Flags().StringVar(&mongoUri, "mongoUri", "mongodb://admin:k1LxehGHCR8Ws@10.41.1.13:27017/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false", "mongo uri")
 	mongoCmd.Flags().StringVar(&database, "database", "filecoin", "database name")
 }
