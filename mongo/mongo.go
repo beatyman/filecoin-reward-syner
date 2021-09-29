@@ -39,6 +39,9 @@ type FilMongoSink struct {
 }
 
 func (fil *FilMongoSink) SaveGasInfoBatch(ctx context.Context, list []Message) error {
+	if len(list)==0{
+		return nil
+	}
 	result, err := fil.gasColl.InsertMany(ctx, list)
 	if err != nil {
 		log.Error(err)
@@ -49,6 +52,9 @@ func (fil *FilMongoSink) SaveGasInfoBatch(ctx context.Context, list []Message) e
 }
 
 func (fil *FilMongoSink) SaveTransInfoBatch(ctx context.Context, list []TransferModel) error {
+	if len(list)==0{
+		return nil
+	}
 	result, err := fil.transColl.InsertMany(ctx, list)
 	if err != nil {
 		log.Error(err)
