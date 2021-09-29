@@ -16,8 +16,8 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-
+	"filecoin-reward-syner/kv"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -32,20 +32,22 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("list called")
+		log.Infof("badger path: %+v",badger)
+		conn,err:=kv.NewKvDBConn(badger,true)
+		if err!=nil{
+			log.Error(err)
+			return
+		}
+		filDB:=kv.NewFilLedgerInstance(conn)
+		filDB.ReadGasInfo(fromHeight)
+		filDB.ReadTransInfo(fromHeight)
 	},
 }
-
+var badger string
+var fromHeight uint64
 func init() {
 	rootCmd.AddCommand(listCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// listCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// listCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	listCmd.Flags().StringVar(&badger, "badger", "/data/sdb/reward", "badger default path")
+	listCmd.Flags().Uint64Var(&fromHeight, "from", 0, "list from height")
 }
