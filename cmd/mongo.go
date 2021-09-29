@@ -24,6 +24,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -64,9 +65,11 @@ to quickly create a Cobra application.`,
 			select {
 			case <-cmd.Context().Done():
 				log.Info("context done")
+				time.Sleep(time.Second*5)
 				return
 			case sig := <-sigCh:
 				log.Infof("signal %s captured", sig)
+				time.Sleep(time.Second*5)
 				return
 			default:
 				gas := filDB.ReadGasInfo(fromHeight)
