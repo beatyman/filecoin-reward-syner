@@ -78,7 +78,6 @@ func ConvertTransferKvToMongo(transfers []kv.TransferModel) []mongo.TransferMode
 		}
 		result = append(result, transfer)
 	}
-	log.Info(len(result))
 	return result
 }
 
