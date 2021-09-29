@@ -48,6 +48,6 @@ var resetHeight uint64
 func init() {
 	rootCmd.AddCommand(resetCmd)
 
-	resetCmd.Flags().Uint64Var(&resetHeight, "reset", 0, "reset sync pos")
+	resetCmd.Flags().Uint64Var(&resetHeight, "height", 0, "reset sync pos")
 	resetCmd.Flags().StringVar(&badger, "badger", "/data/sdb/reward", "badger default path")
 }
