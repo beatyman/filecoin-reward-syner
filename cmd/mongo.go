@@ -21,6 +21,9 @@ import (
 	"filecoin-reward-syner/mongo"
 	"filecoin-reward-syner/util"
 	log "github.com/sirupsen/logrus"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/spf13/cobra"
 )
@@ -55,19 +58,31 @@ to quickly create a Cobra application.`,
 			log.Error(errors.New("end height is less than from height"))
 			return
 		}
+		sigCh := make(chan os.Signal, 2)
+		signal.Notify(sigCh, syscall.SIGTERM, syscall.SIGINT)
 		for endHeight > fromHeight {
-			gas := filDB.ReadGasInfo(fromHeight)
-			if err := mongoConn.SaveGasInfoBatch(cmd.Context(), util.ConvertGasKvToMongo(gas)); err != nil {
-				log.Error(err)
+			select {
+			case <-cmd.Context().Done():
+				log.Info("context done")
+				break
+			case sig := <-sigCh:
+				log.Infof("signal %s captured", sig)
+				break
+			default:
+				gas := filDB.ReadGasInfo(fromHeight)
+				if err := mongoConn.SaveGasInfoBatch(cmd.Context(), util.ConvertGasKvToMongo(gas)); err != nil {
+					log.Error(err)
+				}
+				transfers := filDB.ReadTransInfo(fromHeight)
+				if err = mongoConn.SaveTransInfoBatch(cmd.Context(), util.ConvertTransferKvToMongo(transfers)); err != nil {
+					log.Error(err)
+				}
+				filDB.SaveSyncPos(fromHeight)
+				fromHeight++
+				log.Infof("sync progress height: %d", fromHeight)
 			}
-			transfers := filDB.ReadTransInfo(fromHeight)
-			if err = mongoConn.SaveTransInfoBatch(cmd.Context(), util.ConvertTransferKvToMongo(transfers)); err != nil {
-				log.Error(err)
-			}
-			filDB.SaveSyncPos(fromHeight)
-			fromHeight++
-			log.Infof("sync progress height: %d", fromHeight)
 		}
+		log.Info("gracefull down")
 	},
 }
 var mongoUri string

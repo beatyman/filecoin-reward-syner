@@ -42,12 +42,11 @@ func (fil *FilMongoSink) SaveGasInfoBatch(ctx context.Context, list []Message) e
 	if len(list)==0{
 		return nil
 	}
-	result, err := fil.gasColl.InsertMany(ctx, list)
+	_, err := fil.gasColl.InsertMany(ctx, list)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
-	log.Infof("%+v", result)
 	return nil
 }
 
@@ -55,11 +54,10 @@ func (fil *FilMongoSink) SaveTransInfoBatch(ctx context.Context, list []Transfer
 	if len(list)==0{
 		return nil
 	}
-	result, err := fil.transColl.InsertMany(ctx, list)
+	_, err := fil.transColl.InsertMany(ctx, list)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
-	log.Infof("%+v", result)
 	return nil
 }
