@@ -51,7 +51,7 @@ func (fil *FilLedger) ReadGasInfo(height uint64) {
 		log.Infof("%+v", gconv.String(r.Key))
 		var gas Message
 		_ = json.Unmarshal(r.Value, &gas)
-		log.Infof("%+v", r.Value)
+		log.Infof("%+v", gas)
 	}
 }
 
@@ -65,6 +65,6 @@ func (fil *FilLedger) ReadTransInfo(height uint64) {
 		log.Infof("%+v", gconv.String(r.Key))
 		var tran TransferModel
 		_ = json.Unmarshal(r.Value, &tran)
-		log.Infof("%+v", r.Value)
+		log.Infof("%+v", tran)
 	}
 }
