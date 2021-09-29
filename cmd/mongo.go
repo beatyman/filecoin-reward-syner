@@ -64,10 +64,10 @@ to quickly create a Cobra application.`,
 			select {
 			case <-cmd.Context().Done():
 				log.Info("context done")
-				break
+				return
 			case sig := <-sigCh:
 				log.Infof("signal %s captured", sig)
-				break
+				return
 			default:
 				gas := filDB.ReadGasInfo(fromHeight)
 				if err := mongoConn.SaveGasInfoBatch(cmd.Context(), util.ConvertGasKvToMongo(gas)); err != nil {
@@ -77,7 +77,7 @@ to quickly create a Cobra application.`,
 				if err = mongoConn.SaveTransInfoBatch(cmd.Context(), util.ConvertTransferKvToMongo(transfers)); err != nil {
 					log.Error(err)
 				}
-				filDB.SaveSyncPos(fromHeight)
+				_ = filDB.SaveSyncPos(fromHeight)
 				fromHeight++
 				log.Infof("sync progress height: %d", fromHeight)
 			}
