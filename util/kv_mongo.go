@@ -31,6 +31,7 @@ func ConvertGasKvToMongo(messages []kv.Message) []mongo.Message {
 			details = append(details, detail)
 		}
 		msg := mongo.Message{
+			Id:                 primitive.NewObjectID().Hex(),
 			UUID:               messages[i].UUID,
 			Date:               messages[i].Date,
 			Height:             messages[i].Height,
@@ -60,6 +61,7 @@ func ConvertTransferKvToMongo(transfers []kv.TransferModel) []mongo.TransferMode
 	result := make([]mongo.TransferModel, 0)
 	for i := range transfers {
 		transfer := mongo.TransferModel{
+			Id:        primitive.NewObjectID().Hex(),
 			UUID:      transfers[i].UUID,
 			Date:      transfers[i].Date,
 			Height:    transfers[i].Height,

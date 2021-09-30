@@ -6,6 +6,7 @@ import (
 )
 
 type TransferModel struct {
+	Id        string               `json:"_id" bson:"_id"`
 	UUID      string               `json:"uuid" bson:"uuid" `
 	Date      time.Time            `json:"date" bson:"date"`
 	Height    uint64               `json:"height" bson:"height"`
@@ -24,6 +25,7 @@ type TransferModel struct {
 }
 
 type Message struct {
+	Id                 string               `json:"_id" bson:"_id"`
 	UUID               string               `json:"uuid" bson:"uuid"`
 	Date               time.Time            `json:"date" bson:"date"`
 	Height             uint64               `json:"height" bson:"height"`
