@@ -108,5 +108,5 @@ func init() {
 	mongoCmd.Flags().Uint64Var(&fromHeight, "from", 0, "list from height")
 	mongoCmd.Flags().Uint64Var(&endHeight, "end", 950000, "list from height")
 	mongoCmd.Flags().StringVar(&mongoUri, "mongoUri", "mongodb://admin:k1LxehGHCR8Ws@10.41.1.13:27017/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false", "mongo uri")
-	mongoCmd.Flags().StringVar(&database, "database", "filecoin", "database name")
+	mongoCmd.Flags().StringVar(&database, "database", "analysis", "database name")
 }
