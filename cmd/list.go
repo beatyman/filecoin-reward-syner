@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"filecoin-reward-syner/kv"
+	"filecoin-reward-syner/util"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -40,8 +41,8 @@ to quickly create a Cobra application.`,
 		}
 		filDB:=kv.NewFilLedgerInstance(conn)
 		log.Infof("sync pos: ",filDB.GetSyncPos())
-		filDB.ReadGasInfo(fromHeight)
-		filDB.ReadTransInfo(fromHeight)
+		util.ConvertGasKvToMongo(filDB.ReadGasInfo(fromHeight))
+		util.ConvertTransferKvToMongo(filDB.ReadTransInfo(fromHeight))
 	},
 }
 var badger string
